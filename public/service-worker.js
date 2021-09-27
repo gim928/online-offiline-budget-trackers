@@ -4,11 +4,11 @@ const DATA_CACHE_NAME = "data-cache-v1";
 const FILES_TO_CACHE = [
   "/",
   "index.html",
-  "/manifest.webmanifest",
-  "public/assets/css/style.css",
-  "public/assets/js/index.js",
-  "public/assets/icons/icon-192x192.png",
-  "public/assets/icons/icon-512x512.png",
+  "/manifest.json",
+  "/public/styles.css",
+  "/public/index.js",
+  "/public/icons/icon-192x192.png",
+  "/public/icons/icon-512x512.png",
 ];
 
 //open a cache
@@ -42,14 +42,39 @@ self.addEventListener("activate", function (evt) {
 });
 
 //event listener for fetch
-self.addEventListener("fetch", function (event) {
-  if (event.request.url.includes("/api/transaction")) {
-    console.log("fetching transaction data", event.request);
-    // Will need to respond with local-first strategy
-    event.respondWith(
-      caches.match(event.request).then(function (response) {
-        return response || fetch(event.request);
-      })
+self.addEventListener("fetch", (evt) => {
+  // cache successful GET requests to the API
+  if (evt.request.url.includes("/api/") && evt.request.method === "GET") {
+    evt.respondWith(
+      caches
+        .open(DATA_CACHE_NAME)
+        .then((cache) => {
+          return fetch(evt.request)
+            .then((response) => {
+              // If the response was good, clone it and store it in the cache.
+              if (response.status === 200) {
+                cache.put(evt.request, response.clone());
+              }
+
+              return response;
+            })
+            .catch(() => {
+              // Network request failed, try to get it from the cache.
+              return cache.match(evt.request);
+            });
+        })
+        .catch((err) => console.log(err))
     );
+
+    // stop execution of the fetch event callback
+    return;
   }
+
+  // if the request is not for the API, serve static assets using
+  // "offline-first" approach.
+  evt.respondWith(
+    caches.match(evt.request).then((response) => {
+      return response || fetch(evt.request);
+    })
+  );
 });
