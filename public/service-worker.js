@@ -3,12 +3,12 @@ const DATA_CACHE_NAME = "data-cache-v1";
 
 const FILES_TO_CACHE = [
   "/",
-  "index.html",
+  "/index.html",
   "/manifest.json",
-  "/public/styles.css",
-  "/public/index.js",
-  "/public/icons/icon-192x192.png",
-  "/public/icons/icon-512x512.png",
+  "/styles.css",
+  "/index.js",
+  "/icons/icon-192x192.png",
+  "/icons/icon-512x512.png",
 ];
 
 //open a cache
@@ -43,32 +43,51 @@ self.addEventListener("activate", function (evt) {
 
 //event listener for fetch
 self.addEventListener("fetch", (evt) => {
-  // cache successful GET requests to the API
-  if (evt.request.url.includes("/api/") && evt.request.method === "GET") {
+  if (evt.request.url.includes("/api/")) {
+    console.log("[Service Worker] Fetch(data)", evt.request.url);
+
     evt.respondWith(
-      caches
-        .open(DATA_CACHE_NAME)
-        .then((cache) => {
-          return fetch(evt.request)
-            .then((response) => {
-              // If the response was good, clone it and store it in the cache.
-              if (response.status === 200) {
-                cache.put(evt.request, response.clone());
-              }
-
-              return response;
-            })
-            .catch(() => {
-              // Network request failed, try to get it from the cache.
-              return cache.match(evt.request);
-            });
-        })
-        .catch((err) => console.log(err))
+      caches.open(DATA_CACHE_NAME).then((cache) => {
+        return fetch(evt.request)
+          .then((response) => {
+            if (response.status === 200) {
+              cache.put(evt.request.url, response.clone());
+            }
+            return response;
+          })
+          .catch((err) => {
+            return cache.match(evt.request);
+          });
+      })
     );
-
-    // stop execution of the fetch event callback
     return;
   }
+  // cache successful GET requests to the API
+  // if (evt.request.url.includes("/api/") && evt.request.method === "GET") {
+  //   evt.respondWith(
+  //     caches
+  //       .open(DATA_CACHE_NAME)
+  //       .then((cache) => {
+  //         return fetch(evt.request)
+  //           .then((response) => {
+  //             // If the response was good, clone it and store it in the cache.
+  //             if (response.status === 200) {
+  //               cache.put(evt.request, response.clone());
+  //             }
+
+  //             return response;
+  //           })
+  //           .catch(() => {
+  //             // Network request failed, try to get it from the cache.
+  //             return cache.match(evt.request);
+  //           });
+  //       })
+  //       .catch((err) => console.log(err))
+  //   );
+
+  //   // stop execution of the fetch event callback
+  //   return;
+  // }
 
   // if the request is not for the API, serve static assets using
   // "offline-first" approach.
