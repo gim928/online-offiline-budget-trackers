@@ -40,3 +40,16 @@ self.addEventListener("activate", function (evt) {
 
   self.clients.claim();
 });
+
+//event listener for fetch
+self.addEventListener("fetch", function (event) {
+  if (event.request.url.includes("/api/transaction")) {
+    console.log("fetching transaction data", event.request);
+    // Will need to respond with local-first strategy
+    event.respondWith(
+      caches.match(event.request).then(function (response) {
+        return response || fetch(event.request);
+      })
+    );
+  }
+});
