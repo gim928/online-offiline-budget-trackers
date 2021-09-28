@@ -1,10 +1,9 @@
-const db;
+let db;
 //make connection to db
 const request = indexedDB.open("budget", 1);
 
-
 request.onupgradeneeded = function (event) {
-  const db = event.target.result;
+  db = event.target.result;
   db.createObjectStore("pending", { autoIncrement: true });
 };
 request.onsuccess = function (event) {
@@ -19,16 +18,14 @@ request.onerror = function (event) {
   console.log(event.target.error);
 };
 
-
-function saveRecord(transaction){
-    const transaction = db.transaction(['new_transaction'], readwite)
-    const budget = transaction.objectStore('new_transaction');
-    budget.add(transaction)
-};
-
+function saveRecord(transaction) {
+  const transactionRecord = db.transaction(["pending"], "readwrite");
+  const budget = transactionRecord.objectStore("pending");
+  budget.add(transaction);
+}
 function checkDb() {
-  const transaction = db.transaction(["pending"], "readwrite");
-  const store = transaction.objectStore("pending");
+  const transactionRecord = db.transaction(["pending"], "readwrite");
+  const store = transactionRecord.objectStore("pending");
   const getAll = store.getAll();
 
   getAll.onsuccess = function () {
@@ -47,8 +44,8 @@ function checkDb() {
             throw new Error(data);
           }
           // delete records if successful
-          const transaction = db.transaction(["pending"], "readwrite");
-          const store = transaction.objectStore("pending");
+          const transactionRecord = db.transaction(["pending"], "readwrite");
+          const store = transactionRecord.objectStore("pending");
           store.clear();
           console.log("your transactions have been submitted");
         })
@@ -60,11 +57,10 @@ function checkDb() {
 }
 
 function deletePending() {
-  const transaction = db.transaction(["pending"], "readwrite");
-  const store = transaction.objectStore("pending");
+  const transactionRecord = db.transaction(["pending"], "readwrite");
+  const store = transactionRecord.objectStore("pending");
   store.clear();
 }
-
 
 // listen for app coming back online
 window.addEventListener("online", checkDb);
