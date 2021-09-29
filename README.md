@@ -29,6 +29,9 @@ This applicaiton will be used for the financially minded user to track their exp
 
 ## Screenshots: ![screenshot](./Screenshot.png)
 
+![screenshot](./offline-screenshot.png)
+![screenshot](./back-online-screenshot.png)
+
 ## Tests
 
 npm run test
@@ -44,3 +47,5 @@ Questions?
 You may reach me by email at: <eaim928@gmail.com>
 
 You may also reach me on github: <https://github.com/gim928>
+
+Link to deployed application: <https://warm-cliffs-72947.herokuapp.com/>
