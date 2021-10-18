@@ -25,7 +25,7 @@ npm i
 
 ## Usage
 
-This applicaiton will be used for the financially minded user to track their expenses and deposits even when they cannot get an internet connection.
+This application will be used for the financially minded user to track their expenses and deposits even when they cannot get an internet connection.
 
 ## Screenshots: ![screenshot](./Screenshot.png)
 
